@@ -9,22 +9,23 @@ This project is a work in progress and will continue to expand (see [Next Steps]
 ## Architecture
 
 ```
-┌─────────────────────┐         ┌──────────────────────────┐
-│   Kali Linux (VM)    │  attacks │  Windows 11 Host         │
-│   Attacker machine   │─────────▶│  Monitored endpoint       │
-│                       │         │  - Wazuh Agent            │
-│   - Nmap              │         │  - Sysmon (SwiftOnSecurity│
-│   - Hydra              │         │    config)                │
-└─────────────────────┘         │  - Atomic Red Team         │
-                                  └───────────┬──────────────┘
-                                              │ logs / alerts
-                                              ▼
-                                  ┌──────────────────────────┐
-                                  │  Wazuh Manager (VM)       │
-                                  │  - Manager                │
-                                  │  - Indexer                │
-                                  │  - Dashboard               │
-                                  └──────────────────────────┘
++----------------------+          +-------------------------------+
+|   Kali Linux (VM)    |          |   Windows 11 Host              |
+|   Attacker machine   | attacks  |   Monitored endpoint           |
+|                       |--------->|   - Wazuh Agent                |
+|   - Nmap              |          |   - Sysmon (SwiftOnSecurity    |
+|   - Hydra             |          |     config)                    |
++----------------------+          |   - Atomic Red Team            |
+                                    +---------------+-----------------+
+                                                    |
+                                                    | logs / alerts
+                                                    v
+                                    +-------------------------------+
+                                    |   Wazuh Manager (VM)           |
+                                    |   - Manager                    |
+                                    |   - Indexer                    |
+                                    |   - Dashboard                  |
+                                    +-------------------------------+
 ```
 
 **Network:** All three machines run on the same bridged local network so the attacker VM can reach the monitored endpoint, and the endpoint can forward logs to the Wazuh manager.
@@ -75,7 +76,7 @@ Wazuh's built-in Sysmon-based ruleset generated the following alerts in response
 | 92052 | Windows command prompt started by an abnormal process | 4 (Low) | Windows Command Shell — Execution |
 | 92027 | Powershell process spawned powershell instance | 4 (Low) | PowerShell — Execution |
 | 92032 | Suspicious Windows cmd shell execution | 3 (Low) | Windows Command Shell — Execution |
-| 92034 | Discovery activity spawned via cmd shell execution | 3 (Low) | Account/System Discovery |
+| 92034 | Discovery activity spawned via cmd shell execution | 3 (Low) | T1087 — Account Discovery |
 | 61638 | Sysmon - Suspicious Process - dllhost.exe | 12 (High) | Flagged automatically during monitoring, investigated and assessed as benign endpoint behavior (see [Triage Notes](#triage-notes)) |
 
 ### 24-Hour Alert Summary (from Wazuh Overview dashboard)
